@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { products } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
@@ -14,11 +14,11 @@ export default async function HomePage() {
     featuredProducts = await db
       .select()
       .from(products)
-      .where(eq(products.featured, true))
+      .where(and(eq(products.featured, true), eq(products.archived, false)))
       .orderBy(desc(products.createdAt))
       .limit(4);
     if (featuredProducts.length === 0) {
-      featuredProducts = await db.select().from(products).orderBy(desc(products.createdAt)).limit(4);
+      featuredProducts = await db.select().from(products).where(eq(products.archived, false)).orderBy(desc(products.createdAt)).limit(4);
     }
   } catch {
     featuredProducts = [];
@@ -59,7 +59,7 @@ export default async function HomePage() {
       {/* ─── Hero Section ──────────────────────────────────── */}
       <section className="relative min-h-[92vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/images/hero-bg.jpg" alt="Bereket Foods premium natural foods" fill className="object-cover object-center" priority quality={90} sizes="100vw" />
+          <Image src="/assets/images/story/about-hero.webp" alt="Bereket Foods premium natural foods" fill className="object-cover object-center" priority quality={90} sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#1a2e1c]/90 via-[#1a2e1c]/60 to-[#1a2e1c]/25" />
         </div>
         <div className="absolute top-20 right-10 w-80 h-80 bg-[var(--color-gold)]/10 rounded-full blur-3xl" />
