@@ -3,16 +3,30 @@ const storefrontAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_
 
 async function shopifyFetch({ query, variables = {} }: { query: string; variables?: any }) {
   try {
+    // Debugging logs to verify variables during the Vercel build phase
+    console.log("Shopify Fetch Configured Domain:", domain);
+    console.log("Token Available:", !!storefrontAccessToken);
+
     const result = await fetch(`https://${domain}/api/2026-04/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': storefrontAccessToken!,
+        'X-Shopify-Storefront-Access-Token': storefrontAccessToken || '',
       },
       body: JSON.stringify({ query, variables }),
-      next: { revalidate: 60 } // Automatically update new changes from Shopify every 60 seconds
+      next: { revalidate: 60 }
     });
-    return await result.json();
+
+    // Extract raw text first to avoid the JSON parsing crash
+    const rawText = await result.text();
+
+    if (!result.ok) {
+      console.error(`Shopify HTTP Error Status: ${result.status}`);
+      console.error(`Shopify Raw Error Response: ${rawText}`);
+      return null;
+    }
+
+    return JSON.parse(rawText);
   } catch (error) {
     console.error("Shopify data fetch error:", error);
     return null;
