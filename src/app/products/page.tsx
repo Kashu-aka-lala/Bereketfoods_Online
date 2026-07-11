@@ -24,7 +24,17 @@ export default async function ProductsPage() {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {formattedProducts.map((product: any) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            id={product.id}
+            slug={product.slug}
+            name={product.name}
+            shortDescription={product.description}
+            price={product.price}
+            imageUrl={product.imageUrl}
+            category={product.category}
+            inStock={true}
+          />
         ))}
       </div>
     </main>

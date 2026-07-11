@@ -1,6 +1,4 @@
-import { db } from "@/db";
-import { products } from "@/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { getShopifyProducts } from "@/lib/shopify";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
@@ -9,17 +7,21 @@ import { ArrowRight, Leaf, Shield, Zap, Truck, Star, CheckCircle, Menu, X, Searc
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  let featuredProducts: (typeof products.$inferSelect)[] = [];
+  let featuredProducts: any[] = [];
   try {
-    featuredProducts = await db
-      .select()
-      .from(products)
-      .where(and(eq(products.featured, true), eq(products.archived, false)))
-      .orderBy(desc(products.createdAt))
-      .limit(4);
-    if (featuredProducts.length === 0) {
-      featuredProducts = await db.select().from(products).where(eq(products.archived, false)).orderBy(desc(products.createdAt)).limit(4);
-    }
+    const allProducts = await getShopifyProducts();
+    // Format the shopify products to match the expected ProductCard props
+    featuredProducts = allProducts.slice(0, 4).map(({ node }: any) => ({
+      id: node.id,
+      slug: node.handle,
+      name: node.title,
+      description: node.description,
+      price: node.variants.edges[0]?.node.price.amount,
+      imageUrl: node.images.edges[0]?.node.url || "/logo.png",
+      category: node.productType,
+      brand: node.vendor,
+      variantId: node.variants.edges[0]?.node.id
+    }));
   } catch {
     featuredProducts = [];
   }
