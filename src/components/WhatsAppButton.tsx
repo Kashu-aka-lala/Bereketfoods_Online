@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 
-const WHATSAPP_NUMBER = "923335647799";
+const WHATSAPP_NUMBER = "923309879158";
 const DEFAULT_MESSAGE =
   "Hi! I have a question about Bereket Foods products. Can you help me?";
 
@@ -13,7 +13,7 @@ export default function WhatsAppButton() {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
 
   return (
-    <div className="fixed bottom-20 sm:bottom-6 right-6 z-[90] flex flex-col items-end gap-3 mb-20 sm:mb-0">
+    <div className="fixed bottom-20 sm:bottom-6 right-8 z-[90] flex flex-col items-end gap-3 mb-20 sm:mb-0">
       {/* Tooltip */}
       {isTooltipVisible && (
         <div className="relative bg-white shadow-xl rounded-2xl p-4 max-w-[220px] border border-[#e8e3d5]">

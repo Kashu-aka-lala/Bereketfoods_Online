@@ -47,7 +47,7 @@ export default function ProductPageClient({
           Out of Stock
         </div>
         <a
-          href={`https://wa.me/923335647799?text=${encodeURIComponent(
+          href={`https://wa.me/923309879158?text=${encodeURIComponent(
             `Hi! I'm interested in "${productName}" — can you let me know when it's back in stock?`
           )}`}
           target="_blank"
@@ -125,7 +125,7 @@ export default function ProductPageClient({
 
       {/* WhatsApp Order */}
       <a
-        href={`https://wa.me/923335647799?text=${encodeURIComponent(
+        href={`https://wa.me/923309879158?text=${encodeURIComponent(
           `Hi! I'd like to order "${productName}" (${productWeight ?? ""}) — Qty: ${quantity}. Please assist me.`
         )}`}
         target="_blank"

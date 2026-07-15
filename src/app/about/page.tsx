@@ -39,7 +39,7 @@ export default function AboutPage() {
       {/* Hero */}
       <div className="relative bg-[#1a2e1c] py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="w-full h-full bg-[url('/images/hero-bg.jpg')] bg-cover bg-center" />
+          <div className="w-full h-full bg-[url('/assets/images/story/about-hero.webp')] bg-cover bg-center" />
         </div>
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-[var(--color-forest)]/30 border border-[var(--color-forest)] rounded-full px-4 py-2 mb-6">
@@ -98,11 +98,12 @@ export default function AboutPage() {
           </div>
           <div className="relative h-[450px] rounded-3xl overflow-hidden bg-[#f5f0e8]">
             <Image
-              src="/images/hero-bg.jpg"
+              src="/assets/images/story/about-hero.webp"
               alt="Bereket Foods natural foods"
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
             />
           </div>
         </div>
@@ -125,32 +126,29 @@ export default function AboutPage() {
               {
                 title: "Values",
                 items: ["Goodness", "Innovation", "Quality", "Perseverance", "Excellence"],
-                color: "bg-green-50 border-green-200 text-green-700",
-                emoji: "🌿",
+                icon: <Leaf className="w-10 h-10 text-[var(--color-forest)] mb-4" />,
               },
               {
                 title: "Culture",
                 items: ["Equality", "Integrity", "Diversity", "Ownership", "Openness"],
-                color: "bg-amber-50 border-amber-200 text-amber-700",
-                emoji: "🤝",
+                icon: <Users className="w-10 h-10 text-[var(--color-forest)] mb-4" />,
               },
               {
                 title: "Environment",
                 items: ["Sustainability", "Conservation", "Advocacy", "Responsibility", "Impact"],
-                color: "bg-blue-50 border-blue-200 text-blue-700",
-                emoji: "🌍",
+                icon: <Globe className="w-10 h-10 text-[var(--color-forest)] mb-4" />,
               },
             ].map((pillar) => (
               <div
                 key={pillar.title}
-                className={`rounded-3xl border-2 p-8 ${pillar.color}`}
+                className="bg-white border border-[#f0ece0] rounded-3xl p-8 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
               >
-                <span className="text-4xl mb-4 block">{pillar.emoji}</span>
-                <h3 className="text-xl font-bold mb-4">{pillar.title}</h3>
-                <ul className="space-y-2">
+                {pillar.icon}
+                <h3 className="text-xl font-bold text-[#1a2e1c] mb-4">{pillar.title}</h3>
+                <ul className="space-y-3 text-sm text-[#3a3a2e]">
                   {pillar.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm opacity-80">
-                      <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+                    <li key={item} className="flex items-center gap-2">
+                      <span className="text-[#E2A82C] font-bold text-xs">✓</span>
                       {item}
                     </li>
                   ))}
@@ -195,7 +193,7 @@ export default function AboutPage() {
       </section>
 
       {/* Offices */}
-      <section className="py-16 bg-[#f5f0e8]">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl font-bold text-[#1a2e1c]">
@@ -217,9 +215,12 @@ export default function AboutPage() {
                 address: "2 Km From Bahawalpur Bypass, Bahawalpur Road, Multan",
               },
             ].map((office) => (
-              <div key={office.type} className="bg-white rounded-3xl p-6 border border-[#e8e3d5]">
+              <div 
+                key={office.type} 
+                className="bg-[#f9f8f6] rounded-3xl p-6 border border-[#e8e3d5] h-full flex flex-col justify-start"
+              >
                 <h3 className="font-bold text-[#1a2e1c] mb-3">{office.type}</h3>
-                <p className="text-sm text-[#6b7c6b] leading-relaxed">{office.address}</p>
+                <p className="text-sm text-neutral-600 leading-relaxed">{office.address}</p>
               </div>
             ))}
           </div>
@@ -227,20 +228,27 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#1a2e1c] text-center px-4">
-        <h2 className="font-serif text-3xl font-bold text-white mb-4">
-          Experience the Bereket Difference
-        </h2>
-        <p className="text-[#a8c5ab] mb-8">
-          Start your natural health journey with our premium product range.
-        </p>
-        <Link
-          href="/products"
-          className="inline-flex items-center gap-2 bg-[#c8a24a] text-white px-10 py-4 rounded-full font-bold hover:bg-[#b8922a] transition-all group"
-        >
-          Shop Now
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </Link>
+      <section className="relative overflow-hidden py-20 bg-[#1a2e1c] text-center px-4">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
+        <div className="absolute -left-16 -top-16 w-64 h-64 bg-[#c8a24a] rounded-full blur-3xl opacity-10 pointer-events-none" />
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-[#117744] rounded-full blur-3xl opacity-20 pointer-events-none" />
+
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h2 className="font-serif text-3xl font-bold text-white mb-4">
+            Experience the Bereket Difference
+          </h2>
+          <p className="text-emerald-100 text-base mb-8 max-w-lg mx-auto">
+            Start your natural health journey with our premium product range.
+          </p>
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 bg-[#c8a24a] text-white px-10 py-4 rounded-full font-bold hover:bg-[#b8922a] transition-all group"
+          >
+            Shop Now
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
       </section>
     </div>
   );
