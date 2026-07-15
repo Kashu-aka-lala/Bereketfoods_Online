@@ -7,7 +7,7 @@
 // have access to the Zustand cart store after hydration.
 
 import Navbar from "./Navbar";
-import CartDrawer from "./CartDrawer";
+import CartSheet from "./CartSheet";
 import WhatsAppButton from "./WhatsAppButton";
 import Footer from "./Footer";
 
@@ -15,7 +15,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <CartDrawer />
+      <CartSheet />
       <main className="pt-16 lg:pt-20 min-h-screen bg-[var(--color-cream)]">
         {children}
       </main>
@@ -24,3 +24,4 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     </>
   );
 }
+

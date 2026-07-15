@@ -23,7 +23,7 @@ export default async function ProductPage({
   const firstVariant = node.variants.edges[0]?.node;
 
   const product = {
-    id: node.id as string,
+    id: (firstVariant?.id || node.id) as string,
     title: node.title as string,
     description: node.description as string,
     price: firstVariant?.price?.amount ?? "0",

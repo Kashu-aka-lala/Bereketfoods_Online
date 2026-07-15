@@ -1,7 +1,7 @@
 const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 
-async function shopifyFetch({ query, variables = {} }: { query: string; variables?: any }) {
+export async function shopifyFetch({ query, variables = {} }: { query: string; variables?: any }) {
   try {
     // Debugging logs to verify variables during the Vercel build phase
     console.log("Shopify Fetch Configured Domain:", domain);
@@ -34,10 +34,10 @@ async function shopifyFetch({ query, variables = {} }: { query: string; variable
   }
 }
 
-export async function getShopifyProducts() {
+export async function getShopifyProducts(searchQuery?: string) {
   const query = `
-    query getProducts {
-      products(first: 50) {
+    query getProducts($query: String) {
+      products(first: 50, query: $query) {
         edges {
           node {
             id
@@ -78,6 +78,76 @@ export async function getShopifyProducts() {
       }
     }
   `;
-  const response = await shopifyFetch({ query });
+  const response = await shopifyFetch({ 
+    query, 
+    variables: searchQuery ? { query: searchQuery } : {} 
+  });
   return response?.data?.products?.edges || [];
 }
+
+export async function createShopifyCart(lines: Array<{ merchandiseId: string; quantity: number }>) {
+  const query = `
+    mutation cartCreate($input: CartInput) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+  const response = await shopifyFetch({
+    query,
+    variables: { input: { lines } }
+  });
+  return response?.data?.cartCreate;
+}
+
+export async function addLinesToShopifyCart(cartId: string, lines: Array<{ merchandiseId: string; quantity: number }>) {
+  const query = `
+    mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+  const response = await shopifyFetch({
+    query,
+    variables: { cartId, lines }
+  });
+  return response?.data?.cartLinesAdd;
+}
+
+export async function updateLinesInShopifyCart(cartId: string, lines: Array<{ id: string; quantity: number }>) {
+  const query = `
+    mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+  const response = await shopifyFetch({
+    query,
+    variables: { cartId, lines }
+  });
+  return response?.data?.cartLinesUpdate;
+}
+

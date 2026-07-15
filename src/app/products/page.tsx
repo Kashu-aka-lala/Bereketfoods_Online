@@ -1,8 +1,22 @@
 import { getShopifyProducts } from "@/lib/shopify";
 import ProductCard, { ProductCardProps } from "@/components/ProductCard";
 
-export default async function ProductsPage() {
-  const shopifyProducts = await getShopifyProducts();
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: { search?: string; category?: string };
+}) {
+  let shopifyQuery = "";
+  if (searchParams.category) {
+    shopifyQuery += `product_type:"${searchParams.category}" `;
+  }
+  if (searchParams.search) {
+    shopifyQuery += `"${searchParams.search}"`;
+  }
+  shopifyQuery = shopifyQuery.trim();
+
+  const shopifyProducts = await getShopifyProducts(shopifyQuery || undefined);
+
 
   // Map Shopify data to ProductCard props
   const formattedProducts: ProductCardProps[] = shopifyProducts.map(({ node }: any) => {
@@ -12,7 +26,7 @@ export default async function ProductsPage() {
       (node.totalInventory !== null && node.totalInventory > 0);
 
     return {
-      id: node.id as string,
+      id: (firstVariant?.id || node.id) as string,
       slug: node.handle as string,
       name: node.title as string,
       shortDescription: node.description || null,

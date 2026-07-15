@@ -1,12 +1,12 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { X, Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
+import { X, Plus, Minus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createShopifyCart } from "@/lib/shopify";
 
-export default function CartDrawer() {
+export default function CartSheet() {
   const {
     items,
     isOpen,
@@ -14,9 +14,12 @@ export default function CartDrawer() {
     removeItem,
     updateQuantity,
     getSubtotal,
+    setCartId,
+    setCheckoutUrl,
   } = useCartStore();
 
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Close on outside click
   useEffect(() => {
@@ -33,24 +36,59 @@ export default function CartDrawer() {
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   const subtotal = getSubtotal();
-  const shipping = subtotal > 2000 ? 0 : 200;
-  const total = subtotal + shipping;
+
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
+    setIsCheckingOut(true);
+    try {
+      // Map local cart items to Shopify cart line items
+      const lines = items.map((item) => ({
+        merchandiseId: item.id, // This MUST be the Variant GID (stored in item.id)
+        quantity: item.quantity,
+      }));
+
+      // Create a Shopify Cart
+      const cartResponse = await createShopifyCart(lines);
+
+      if (cartResponse?.cart?.checkoutUrl) {
+        const { id, checkoutUrl } = cartResponse.cart;
+        // Save to Zustand
+        setCartId(id);
+        setCheckoutUrl(checkoutUrl);
+        // Redirect to Shopify's secure checkout page
+        window.location.href = checkoutUrl;
+      } else {
+        const errorMsg = cartResponse?.userErrors?.[0]?.message || "Could not generate checkout URL.";
+        alert(`Checkout Error: ${errorMsg}`);
+      }
+    } catch (err) {
+      console.error("Checkout redirection error:", err);
+      alert("Something went wrong while preparing checkout. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex">
+    <div className="fixed inset-0 z-[100] flex justify-end">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div 
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" 
+        onClick={closeCart}
+      />
 
       {/* Drawer */}
       <div
         ref={drawerRef}
-        className="absolute right-0 top-0 h-full w-full max-w-md bg-[var(--color-cream)] shadow-2xl flex flex-col"
+        className="relative z-10 h-full w-full max-w-md bg-[var(--color-cream)] shadow-2xl flex flex-col transform transition-transform duration-300"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#e8e3d5]">
@@ -73,7 +111,7 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        {/* Items */}
+        {/* Items list */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-16">
@@ -84,13 +122,12 @@ export default function CartDrawer() {
               <p className="text-sm text-[#6b7c6b] mb-6">
                 Discover our premium natural products
               </p>
-              <Link
-                href="/products"
+              <button
                 onClick={closeCart}
                 className="bg-[var(--color-forest)] text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-[#2d5235] transition-colors"
               >
                 Shop Now
-              </Link>
+              </button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -122,7 +159,8 @@ export default function CartDrawer() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="w-7 h-7 rounded-full border border-[#e0d9c8] flex items-center justify-center hover:bg-[#f0ece0] transition-colors"
+                          disabled={isCheckingOut}
+                          className="w-7 h-7 rounded-full border border-[#e0d9c8] flex items-center justify-center hover:bg-[#f0ece0] transition-colors disabled:opacity-50"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -131,14 +169,16 @@ export default function CartDrawer() {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-7 h-7 rounded-full border border-[#e0d9c8] flex items-center justify-center hover:bg-[#f0ece0] transition-colors"
+                          disabled={isCheckingOut}
+                          className="w-7 h-7 rounded-full border border-[#e0d9c8] flex items-center justify-center hover:bg-[#f0ece0] transition-colors disabled:opacity-50"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="p-1.5 hover:bg-red-50 hover:text-red-500 text-[#9a9080] rounded-lg transition-colors"
+                        disabled={isCheckingOut}
+                        className="p-1.5 hover:bg-red-50 hover:text-red-500 text-[#9a9080] rounded-lg transition-colors disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -150,46 +190,42 @@ export default function CartDrawer() {
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer info & checkout */}
         {items.length > 0 && (
           <div className="border-t border-[#e8e3d5] px-6 py-5 space-y-4">
-            {/* Totals */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-[#6b7c6b]">
                 <span>Subtotal</span>
                 <span>Rs. {subtotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-sm text-[#6b7c6b]">
-                <span>Shipping</span>
-                <span>
-                  {shipping === 0 ? (
-                    <span className="text-[var(--color-forest)] font-medium">Free</span>
-                  ) : (
-                    `Rs. ${shipping}`
-                  )}
-                </span>
+              <div className="flex justify-between text-sm font-semibold text-gray-500">
+                <span>Shipping & Taxes</span>
+                <span className="font-normal text-xs italic">Calculated at checkout</span>
               </div>
-              {shipping > 0 && (
-                <p className="text-xs text-[#6b7c6b]">
-                  Free shipping on orders over Rs. 2,000
-                </p>
-              )}
               <div className="flex justify-between text-base font-bold text-[#1a2e1c] pt-2 border-t border-[#f0ece0]">
-                <span>Total</span>
-                <span>Rs. {total.toLocaleString()}</span>
+                <span>Estimated Total</span>
+                <span>Rs. {subtotal.toLocaleString()}</span>
               </div>
             </div>
 
-            <Link
-              href="/checkout"
-              onClick={closeCart}
-              className="block w-full bg-[var(--color-forest)] text-white text-center py-3.5 rounded-full font-semibold hover:bg-[#2d5235] transition-colors"
+            <button
+              onClick={handleCheckout}
+              disabled={isCheckingOut || items.length === 0}
+              className="w-full flex items-center justify-center gap-2 bg-[var(--color-forest)] text-white text-center py-3.5 rounded-full font-semibold hover:bg-[#2d5235] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Proceed to Checkout
-            </Link>
+              {isCheckingOut ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Processing Checkout...
+                </>
+              ) : (
+                "Proceed to Checkout"
+              )}
+            </button>
             <button
               onClick={closeCart}
-              className="block w-full text-center py-2 text-sm text-[#6b7c6b] hover:text-[#3a3a2e] transition-colors"
+              disabled={isCheckingOut}
+              className="block w-full text-center py-2 text-sm text-[#6b7c6b] hover:text-[#3a3a2e] transition-colors disabled:opacity-50"
             >
               Continue Shopping
             </button>

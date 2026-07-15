@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, Menu, X, Search, User, ChevronDown } from "lucide-react";
+import { ShoppingBag, Menu, X, Search, ChevronDown } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 const CATEGORIES = [
   { name: "Breakfast Cereals", href: "/products?category=Breakfast+Cereals" },
@@ -21,6 +22,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     setItemCount(getItemCount());
@@ -33,6 +37,15 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setMenuOpen(false);
+    }
+  };
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -78,9 +91,36 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <button className="hidden sm:flex w-10 h-10 items-center justify-center rounded-full bg-[var(--color-cream)] text-gray-600 hover:text-[var(--color-forest)] hover:scale-105 transition-all shadow-sm">
-              <Search className="w-5 h-5" />
-            </button>
+            {searchOpen ? (
+              <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center gap-1 relative z-50">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-44 md:w-56 pl-4 pr-8 py-1.5 rounded-full border border-[#e0d9c8] text-xs bg-[var(--color-cream)] focus:outline-none focus:ring-1 focus:ring-[var(--color-forest)] transition-all"
+                  autoFocus
+                />
+                <button type="submit" className="absolute right-9 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[var(--color-forest)]">
+                  <Search className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  className="p-1 text-gray-400 hover:text-red-500 rounded-full"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </form>
+            ) : (
+              <button 
+                onClick={() => setSearchOpen(true)}
+                className="hidden sm:flex w-10 h-10 items-center justify-center rounded-full bg-[var(--color-cream)] text-gray-600 hover:text-[var(--color-forest)] hover:scale-105 transition-all shadow-sm"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            )}
+
             <button onClick={openCart} className="relative flex items-center gap-1.5 bg-transparent text-gray-700 px-3 py-2 rounded-full text-sm font-medium hover:bg-[var(--color-cream)] transition-colors">
               <ShoppingBag className="w-5 h-5" />
               <span className="text-gray-600 font-medium">({itemCount})</span>
@@ -95,6 +135,20 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div className={clsx("lg:hidden bg-white border-t border-gray-100 transition-all duration-300", menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden")}>
         <div className="px-4 py-4 space-y-2">
+          {/* Mobile Search */}
+          <form onSubmit={handleSearchSubmit} className="relative flex items-center mb-3">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products..."
+              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm bg-[var(--color-cream)] focus:outline-none focus:ring-1 focus:ring-[var(--color-forest)]"
+            />
+            <button type="submit" className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[var(--color-forest)]">
+              <Search className="w-4 h-4" />
+            </button>
+          </form>
+
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-base font-medium text-gray-600 hover:bg-[var(--color-cream)] hover:text-[var(--color-forest)] rounded-lg transition-colors">
               {link.label}
