@@ -85,14 +85,14 @@ export default async function HomePage() {
               <Link href="/products" className="btn-primary inline-flex items-center justify-center gap-2 text-base group">
                 Shop All Products <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/about" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full font-semibold text-base hover:bg-white/20 transition-all duration-300">
+              <Link href="/about" className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-base hover:bg-white hover:text-black transition-all duration-300">
                 Our Story
               </Link>
             </div>
             <div className="mt-12 flex flex-wrap gap-6 animate-fade-in-up opacity-0" style={{ animationDelay: '550ms', animationFillMode: 'forwards' }}>
-              <div className="flex items-center gap-2 text-white/70"><CheckCircle className="w-5 h-5 text-[var(--color-forest)]" /><span className="text-sm font-medium">Halal Certified</span></div>
-              <div className="flex items-center gap-2 text-white/70"><CheckCircle className="w-5 h-5 text-[var(--color-forest)]" /><span className="text-sm font-medium">100% Natural</span></div>
-              <div className="flex items-center gap-2 text-white/70"><CheckCircle className="w-5 h-5 text-[var(--color-forest)]" /><span className="text-sm font-medium">Free Shipping</span></div>
+              <div className="flex items-center gap-2 text-white"><CheckCircle className="w-5 h-5 text-[var(--color-gold)] drop-shadow-sm" /><span className="text-base font-semibold drop-shadow-md">Halal Certified</span></div>
+              <div className="flex items-center gap-2 text-white"><CheckCircle className="w-5 h-5 text-[var(--color-gold)] drop-shadow-sm" /><span className="text-base font-semibold drop-shadow-md">100% Natural</span></div>
+              <div className="flex items-center gap-2 text-white"><CheckCircle className="w-5 h-5 text-[var(--color-gold)] drop-shadow-sm" /><span className="text-base font-semibold drop-shadow-md">Free Shipping</span></div>
             </div>
           </div>
         </div>
