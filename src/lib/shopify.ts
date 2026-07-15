@@ -151,3 +151,51 @@ export async function updateLinesInShopifyCart(cartId: string, lines: Array<{ id
   return response?.data?.cartLinesUpdate;
 }
 
+export async function getShopifyProductByHandle(handle: string) {
+  const query = `
+    query getProductByHandle($handle: String!) {
+      product(handle: $handle) {
+        id
+        handle
+        title
+        description
+        productType
+        vendor
+        totalInventory
+        images(first: 5) {
+          edges {
+            node {
+              url
+              altText
+            }
+          }
+        }
+        variants(first: 250) {
+          edges {
+            node {
+              id
+              title
+              price {
+                amount
+              }
+              compareAtPrice {
+                amount
+              }
+              availableForSale
+              quantityAvailable
+              weight
+              weightUnit
+            }
+          }
+        }
+      }
+    }
+  `;
+  const response = await shopifyFetch({
+    query,
+    variables: { handle }
+  });
+  return response?.data?.product || null;
+}
+
+
