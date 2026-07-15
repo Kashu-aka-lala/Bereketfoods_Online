@@ -4,7 +4,6 @@ import { useCartStore } from "@/store/cartStore";
 import { X, Plus, Minus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { createShopifyCart } from "@/lib/shopify";
 
 export default function CartSheet() {
   const {
@@ -47,33 +46,40 @@ export default function CartSheet() {
     if (items.length === 0) return;
     setIsCheckingOut(true);
     try {
-      // Map local cart items to Shopify cart line items
       const lines = items.map((item) => ({
-        merchandiseId: item.id, // This MUST be the Variant GID (stored in item.id)
+        merchandiseId: item.id, // Shopify Variant GID
         quantity: item.quantity,
       }));
 
-      // Create a Shopify Cart
-      const cartResponse = await createShopifyCart(lines);
+      console.log("[CartSheet] Creating cart with lines:", JSON.stringify(lines));
 
-      if (cartResponse?.cart?.checkoutUrl) {
-        const { id, checkoutUrl } = cartResponse.cart;
-        // Save to Zustand
-        setCartId(id);
-        setCheckoutUrl(checkoutUrl);
-        // Redirect to Shopify's secure checkout page
-        window.location.href = checkoutUrl;
-      } else {
-        const errorMsg = cartResponse?.userErrors?.[0]?.message || "Could not generate checkout URL.";
-        alert(`Checkout Error: ${errorMsg}`);
+      // Hit our server-side API route (avoids Next.js fetch caching on mutations)
+      const res = await fetch("/api/shopify/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "create", lines }),
+      });
+
+      const data = await res.json();
+      console.log("[CartSheet] API response:", data);
+
+      if (!res.ok || data.error) {
+        alert(`Checkout Error: ${data.error || "Unknown error"}`);
+        return;
       }
+
+      const { id, checkoutUrl } = data.cart;
+      setCartId(id);
+      setCheckoutUrl(checkoutUrl);
+      window.location.href = checkoutUrl;
     } catch (err) {
-      console.error("Checkout redirection error:", err);
+      console.error("[CartSheet] Checkout error:", err);
       alert("Something went wrong while preparing checkout. Please try again.");
     } finally {
       setIsCheckingOut(false);
     }
   };
+
 
   if (!isOpen) return null;
 
