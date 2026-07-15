@@ -78,7 +78,7 @@ export default async function HomePage() {
             <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6 animate-fade-in-up opacity-0" style={{ animationDelay: '150ms', animationFillMode: 'forwards' }}>
               Nature&apos;s <span className="text-gradient">Finest</span><br />Goodness
             </h1>
-            <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-10 max-w-lg animate-fade-in-up opacity-0" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
+            <p className="hero-paragraph text-lg sm:text-xl text-white/85 leading-relaxed mb-10 max-w-lg animate-fade-in-up opacity-0" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
               Bringing prosperity to your table through the perfect amalgamation of nature and science. Premium natural foods — Halal certified, delivered across Pakistan.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up opacity-0" style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}>

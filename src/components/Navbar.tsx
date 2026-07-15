@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Menu, X, Search, User, ChevronDown } from "lucide-react";
+import { ShoppingBag, Menu, X, Search, User, ChevronDown } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
@@ -43,10 +43,10 @@ export default function Navbar() {
   return (
     <header className={clsx("fixed top-0 left-0 right-0 z-50 transition-all duration-300", scrolled ? "bg-white/95 backdrop-blur-md shadow-lg shadow-black/5" : "bg-white/90 backdrop-blur-sm")}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-18 lg:h-22 py-2">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-[var(--color-forest)] flex items-center justify-center overflow-hidden group-hover:bg-[var(--color-gold)] transition-colors duration-300">
+            <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center overflow-hidden group-hover:opacity-80 transition-opacity duration-300">
               <Image src="/logo.png" alt="Bereket Foods" width={36} height={36} className="object-contain" />
             </div>
             <div className="flex flex-col leading-none">
@@ -77,14 +77,13 @@ export default function Navbar() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            <button className="hidden sm:flex w-10 h-10 items-center justify-center rounded-full bg-[var(--color-cream)] text-gray-500 hover:text-[var(--color-gold)] hover:scale-105 transition-all">
-              <Search className="w-4 h-4" />
+          <div className="flex items-center gap-3">
+            <button className="hidden sm:flex w-10 h-10 items-center justify-center rounded-full bg-[var(--color-cream)] text-gray-600 hover:text-[var(--color-forest)] hover:scale-105 transition-all shadow-sm">
+              <Search className="w-5 h-5" />
             </button>
-            <button onClick={openCart} className="relative flex items-center gap-2 bg-[var(--color-forest)] text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-[var(--color-gold)] transition-colors shadow-lg shadow-[var(--color-forest)]/20">
-              <ShoppingCart className="w-4 h-4" />
-              <span className="hidden sm:inline">Cart</span>
-              {itemCount > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--color-gold)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">{itemCount > 9 ? "9+" : itemCount}</span>}
+            <button onClick={openCart} className="relative flex items-center gap-1.5 bg-transparent text-gray-700 px-3 py-2 rounded-full text-sm font-medium hover:bg-[var(--color-cream)] transition-colors">
+              <ShoppingBag className="w-5 h-5" />
+              <span className="text-gray-600 font-medium">({itemCount})</span>
             </button>
             <button className="lg:hidden p-2.5 text-gray-600" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
