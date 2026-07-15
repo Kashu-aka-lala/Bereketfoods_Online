@@ -1,42 +1,65 @@
 import { getShopifyProducts } from "@/lib/shopify";
-import ProductCard from "@/components/ProductCard";
+import ProductCard, { ProductCardProps } from "@/components/ProductCard";
 
 export default async function ProductsPage() {
   const shopifyProducts = await getShopifyProducts();
 
-  // Map the new live Shopify data structures directly into your existing layout props
-  const formattedProducts = shopifyProducts.map(({ node }: any) => ({
-    id: node.id,
-    slug: node.handle,
-    name: node.title,
-    description: node.description,
-    price: node.variants.edges[0]?.node.price.amount,
-    imageUrl: node.images.edges[0]?.node.url || "/logo.png",
-    category: node.productType,
-    brand: node.vendor,
-    variantId: node.variants.edges[0]?.node.id
-  }));
+  // Map Shopify data to ProductCard props
+  const formattedProducts: ProductCardProps[] = shopifyProducts.map(({ node }: any) => {
+    const firstVariant = node.variants.edges[0]?.node;
+    const inStock =
+      firstVariant?.availableForSale === true ||
+      (node.totalInventory !== null && node.totalInventory > 0);
+
+    return {
+      id: node.id as string,
+      slug: node.handle as string,
+      name: node.title as string,
+      shortDescription: node.description || null,
+      price: firstVariant?.price?.amount ?? "0",
+      comparePrice: firstVariant?.compareAtPrice?.amount ?? null,
+      imageUrl: node.images.edges[0]?.node.url || "/logo.png",
+      category: node.productType || null,
+      brand: node.vendor || null,
+      weight:
+        firstVariant?.weight && firstVariant?.weightUnit
+          ? `${firstVariant.weight} ${firstVariant.weightUnit}`
+          : null,
+      inStock,
+    };
+  });
 
   return (
     <main className="bg-cream min-h-screen p-8">
       <h1 className="font-serif text-4xl text-charcoal mb-8 text-center">
         Our Premium Natural Foods
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {formattedProducts.map((product: any) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            slug={product.slug}
-            name={product.name}
-            shortDescription={product.description}
-            price={product.price}
-            imageUrl={product.imageUrl}
-            category={product.category}
-            inStock={true}
-          />
-        ))}
-      </div>
+
+      {formattedProducts.length === 0 ? (
+        <div className="text-center py-20 text-gray-500">
+          <p className="text-xl mb-2">No products found.</p>
+          <p className="text-sm">Check back soon — we&apos;re restocking!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {formattedProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              slug={product.slug}
+              name={product.name}
+              shortDescription={product.shortDescription}
+              price={product.price}
+              comparePrice={product.comparePrice}
+              imageUrl={product.imageUrl}
+              category={product.category}
+              brand={product.brand}
+              weight={product.weight}
+              inStock={product.inStock}
+            />
+          ))}
+        </div>
+      )}
     </main>
   );
 }

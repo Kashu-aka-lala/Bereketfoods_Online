@@ -6,7 +6,7 @@ import { ShoppingCart, Plus, Minus, Zap, Check } from "lucide-react";
 import Link from "next/link";
 
 interface ProductPageClientProps {
-  productId: number;
+  productId: string;
   productName: string;
   productPrice: number;
   productImageUrl: string;

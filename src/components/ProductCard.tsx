@@ -8,7 +8,7 @@ import { useState } from "react";
 import clsx from "clsx";
 
 export interface ProductCardProps {
-  id: number;
+  id: string; // Shopify GID string e.g. "gid://shopify/Product/123"
   slug: string;
   name: string;
   shortDescription?: string | null;
@@ -97,7 +97,7 @@ export default function ProductCard({
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {badge && badgeStyle && <span className={clsx("text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wide", badgeStyle)}>{badge}</span>}
-          {discount && <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500 text-white">-{discount}%</span>}
+          {discount && discount > 0 && <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500 text-white">-{discount}%</span>}
         </div>
 
         {!inStock && <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><span className="text-white text-sm font-semibold bg-black/60 px-4 py-2 rounded-full">Out of Stock</span></div>}
@@ -122,7 +122,7 @@ export default function ProductCard({
         <div className="mt-4 flex items-center justify-between">
           <div>
             <span className="text-xl font-bold text-[var(--color-charcoal)]">Rs. {priceNum.toLocaleString()}</span>
-            {comparePriceNum && <span className="text-sm text-gray-400 line-through ml-2">Rs. {comparePriceNum.toLocaleString()}</span>}
+            {comparePriceNum && comparePriceNum > priceNum && <span className="text-sm text-gray-400 line-through ml-2">Rs. {comparePriceNum.toLocaleString()}</span>}
           </div>
           <button onClick={handleAddToCart} disabled={!inStock} className={clsx("w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200", inStock ? "bg-[var(--color-gold)] text-white hover:bg-[#A68B4D] hover:scale-110 shadow-md" : "bg-gray-200 text-gray-400 cursor-not-allowed")} aria-label={`Add ${name} to cart`}>
             <ShoppingCart className="w-4 h-4" />

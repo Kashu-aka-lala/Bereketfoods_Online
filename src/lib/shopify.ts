@@ -8,7 +8,7 @@ async function shopifyFetch({ query, variables = {} }: { query: string; variable
     console.log("Token Available:", !!storefrontAccessToken);
 
     // Changed version from 2026-04 to 2024-07 for absolute stability
-    const result = await fetch(`https://${domain}/api/2025-01/graphql.json`, {
+    const result = await fetch(`https://${domain}/api/2024-07/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,6 +46,7 @@ export async function getShopifyProducts() {
             description
             productType
             vendor
+            totalInventory
             images(first: 1) {
               edges {
                 node {
@@ -54,13 +55,21 @@ export async function getShopifyProducts() {
                 }
               }
             }
-            variants(first: 1) {
+            variants(first: 250) {
               edges {
                 node {
                   id
+                  title
                   price {
                     amount
                   }
+                  compareAtPrice {
+                    amount
+                  }
+                  availableForSale
+                  quantityAvailable
+                  weight
+                  weightUnit
                 }
               }
             }
