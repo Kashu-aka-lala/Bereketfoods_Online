@@ -30,8 +30,8 @@ export default async function ProductsPage() {
   });
 
   return (
-    <main className="bg-cream min-h-screen p-8">
-      <h1 className="font-serif text-4xl text-charcoal mb-8 text-center">
+    <main className="bg-cream min-h-screen px-6 py-6">
+      <h1 className="font-serif text-3xl text-charcoal mb-6 text-center">
         Our Premium Natural Foods
       </h1>
 
@@ -41,7 +41,7 @@ export default async function ProductsPage() {
           <p className="text-sm">Check back soon — we&apos;re restocking!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {formattedProducts.map((product) => (
             <ProductCard
               key={product.id}
