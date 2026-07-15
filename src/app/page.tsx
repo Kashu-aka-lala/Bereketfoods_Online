@@ -98,11 +98,11 @@ export default async function HomePage() {
         </div>
         <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-            <div className="grid grid-cols-4 divide-x divide-white/20">
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/20">
               {stats.map((stat, i) => (
-                <div key={stat.label} className="text-center px-4 animate-fade-in-up opacity-0" style={{ animationDelay: `${650 + i * 100}ms`, animationFillMode: 'forwards' }}>
+                <div key={stat.label} className="text-center px-3 sm:px-4 py-3 sm:py-0 animate-fade-in-up opacity-0 flex flex-col justify-center" style={{ animationDelay: `${650 + i * 100}ms`, animationFillMode: 'forwards' }}>
                   <p className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</p>
-                  <p className="text-xs sm:text-sm text-white/70 mt-1">{stat.label}</p>
+                  <p className="text-xs sm:text-sm text-white/80 mt-1">{stat.label}</p>
                 </div>
               ))}
             </div>
